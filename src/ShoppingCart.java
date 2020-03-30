@@ -14,16 +14,12 @@ public class ShoppingCart {
         Scanner scan = new Scanner(System.in);
         String product = scan.nextLine();
 
-        /* TODO:
-           - check if the amount of credits is enough, if not stop the execution.
-           - otherwise, withdraw the price of the product from the wallet.
-           - add the name of the product to the pocket file.
-           - print the new balance.
-         */
+
         int currentBalance = wallet.getBalance();
         // Check if the amount of credit is enough, if not stop the execution
         if (currentBalance >= Store.getProductPrice(product)) {
             System.out.println("You just bought a " + product);
+            Thread.sleep(1000);
             // Withdraw the price of the product from the wallet
             wallet.setBalance(currentBalance - Store.getProductPrice(product));
             // add the name of the product to the pocket file
@@ -34,6 +30,7 @@ public class ShoppingCart {
             System.out.println("Not enough money in your wallet.. closing program !");
             System.exit(0);
         }
+
 
     }
 }

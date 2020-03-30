@@ -2,12 +2,15 @@ package backEnd;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class Wallet {
     /**
      * The RandomAccessFile of the wallet file
      */  
     private RandomAccessFile file;
+    private Lock lock;
 
     /**
      * Creates a Wallet object
@@ -16,6 +19,7 @@ public class Wallet {
      */
     public Wallet () throws Exception {
 	this.file = new RandomAccessFile(new File("backEnd/wallet.txt"), "rw");
+	this.lock = new ReentrantLock();
     }
 
     /**
@@ -44,5 +48,15 @@ public class Wallet {
      */
     public void close() throws Exception {
 	this.file.close();
+    }
+
+    /**
+     * Thread-safe withdraw function
+     */
+    public void safeWithdraw(int valueToWithdraw) throws Exception {
+        this.lock.lock();
+        this.setBalance(this.getBalance() - valueToWithdraw);
+        this.lock.unlock();
+
     }
 }
