@@ -20,13 +20,12 @@ public class ShoppingCart {
            - add the name of the product to the pocket file.
            - print the new balance.
          */
-
-        System.out.println(product);
+        int currentBalance = wallet.getBalance();
         // Check if the amount of credit is enough, if not stop the execution
-        if (wallet.getBalance() >= Store.getProductPrice(product)) {
+        if (currentBalance >= Store.getProductPrice(product)) {
             System.out.println("You just bought a " + product);
             // Withdraw the price of the product from the wallet
-            wallet.setBalance(wallet.getBalance() - Store.getProductPrice(product));
+            wallet.setBalance(currentBalance - Store.getProductPrice(product));
             // add the name of the product to the pocket file
             pocket.addProduct(product);
             // print the new balance.
