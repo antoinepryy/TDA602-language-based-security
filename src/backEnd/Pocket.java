@@ -1,7 +1,7 @@
 package backEnd;
 import java.io.File;
-import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.util.concurrent.locks.ReentrantLock;
 
 
 public class Pocket {
@@ -9,6 +9,7 @@ public class Pocket {
      * The RandomAccessFile of the pocket file
      */
     private RandomAccessFile file;
+    private ReentrantLock pocketLock;
 
     /**
      * Creates a Pocket object
@@ -17,6 +18,7 @@ public class Pocket {
      */
     public Pocket () throws Exception {
         this.file = new RandomAccessFile(new File("backEnd/pocket.txt"), "rw");
+        this.pocketLock = new ReentrantLock();
     }
 
     /**
@@ -27,6 +29,15 @@ public class Pocket {
     public void addProduct(String product) throws Exception {
         this.file.seek(this.file.length());
         this.file.writeBytes(product+'\n'); 
+    }
+
+    /**
+     * Thread-safe wallet management function
+     */
+    public void safeAddProduct(String product) throws Exception {
+        this.pocketLock.lock();
+        this.addProduct(product);
+        this.pocketLock.unlock();
     }
 
     /**

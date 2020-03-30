@@ -21,9 +21,9 @@ public class ShoppingCart {
             System.out.println("You just bought a " + product);
             Thread.sleep(1000);
             // Withdraw the price of the product from the wallet
-            wallet.setBalance(currentBalance - Store.getProductPrice(product));
+            wallet.safeWithdraw(Store.getProductPrice(product));
             // add the name of the product to the pocket file
-            pocket.addProduct(product);
+            pocket.safeAddProduct(product);
             // print the new balance.
             System.out.println("New balance : " + wallet.getBalance());
         } else {
