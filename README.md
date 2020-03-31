@@ -2,6 +2,11 @@
 
 ## Lab 1 - TOCTOU
 
+### Part 0 : About source code
+
+- All our code is located in src folder 
+
+
 ### Part 1 : Exploit your program
 
 - Shared resource are the wallet (wallet.txt) and our pocket (pocket.txt), that are shared between users that call our ShoppingCart file.
@@ -44,3 +49,50 @@ public void safeAddProduct(String product) throws Exception {
     }
 
 ```
+
+We also have to bring some changes to our main function in order to use safe-threaded functions
+
+```java
+
+        int currentBalance = wallet.getBalance();
+        // Check if the amount of credit is enough, if not stop the execution
+        if (currentBalance >= Store.getProductPrice(product)) {
+            System.out.println("You just bought a " + product);
+            Thread.sleep(1000);
+            // Withdraw the price of the product from the wallet
+            wallet.safeWithdraw(Store.getProductPrice(product));
+            // add the name of the product to the pocket file
+            pocket.safeAddProduct(product);
+            // print the new balance.
+            System.out.println("New balance : " + wallet.getBalance());
+        } else {
+            System.out.println("Not enough money in your wallet.. closing program !");
+            System.exit(0);
+        }
+
+```
+
+
+instead of 
+
+
+```java
+
+        int currentBalance = wallet.getBalance();
+        // Check if the amount of credit is enough, if not stop the execution
+        if (currentBalance >= Store.getProductPrice(product)) {
+            System.out.println("You just bought a " + product);
+            Thread.sleep(1000);
+            // Withdraw the price of the product from the wallet
+            wallet.setBalance(currentBalance - Store.getProductPrice(product));
+            // add the name of the product to the pocket file
+            pocket.addProduct(product);
+            // print the new balance.
+            System.out.println("New balance : " + wallet.getBalance());
+        } else {
+            System.out.println("Not enough money in your wallet.. closing program !");
+            System.exit(0);
+        }
+
+```
+
