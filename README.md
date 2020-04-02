@@ -35,13 +35,15 @@
 
 - In order to compile and run this program (Windows), you can simply use your command prompt and run the program `run.bat` located in src folder. It will compile you program (you have to ensure that Java is installed and configured on your machine) and then it will launch automatically two instances of the program in order to see if data races occur.
 
+![No thread-Safe Version](/assets/lab1/no-thread-safe.PNG)
+
 ### Part 2 : Fix the API
 
 - The `safeWidthDraw` function is implemented in the `Wallet` class.
 - The `Pocket` class also suffers from possible race conditions, since it contains a method that is able to perform a write in a file. We have to ensure that this is done in a thread-safe manner.
 - These protections are enough because `Pocket` & `Wallet` classes were the only ones that were allowed to perform any form of writing and since all other classes don't rely on data writes in order to run, we are sure that our program does not contain data races issues anymore.
 
-![Thread Safe Version](/assets/lab1/thread-safe.PNG)
+![Thread-Safe Version](/assets/lab1/thread-safe.PNG)
 
 The thread safe withdraw function implemented in `Wallet` class 
    
