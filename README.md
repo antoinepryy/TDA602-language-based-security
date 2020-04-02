@@ -16,6 +16,7 @@
 - Shared resources are the wallet `wallet.txt` and our pocket `pocket.txt`, that are shared between users that call our `ShoppingCart.java` file.
 - The root of the problem is that our program verify in a first step that we have enough money in our wallet, but only withdraw it in a second step. If two or more users are calling the function at the same time, it can happen that both programs enter in the first step at the same time.
 - To attack the system, you can run at the same time several instances of the program and when a data race error occurs, you will be able to have several items in your `pocket.txt` by paying only for one of them.
+- If the configuration below happens during execution, a problem will occur and will cause troubles in the accuracy of the program. This error is highlighted using the `run.bat` script with the unpatched version of the code.
 
    
 ```
@@ -29,9 +30,10 @@
                                 THREAD 2
 
 ```
-If the configuration above happens during execution, a problem will occur and will cause troubles in the accuracy of the program. This error is highlighted using the `run.bat` script with the unpatched version of the code.
 
-- In order to compile and run this program (Windows), you can simply use your command prompt and run the program run.bat located in src folder. It will compile you program (you have to ensure that Java is installed and configured on your machine) and then it will launch automatically two instances of the program in order to see if data races occur.
+- Our `run.bat` script basically fill our wallet with 30000$, empty our pocket, then spawn 2 threads that will try to buy a car. Once the operation is finished, it checks if data race errors occrued by counting the number if items that were bought.
+
+- In order to compile and run this program (Windows), you can simply use your command prompt and run the program `run.bat` located in src folder. It will compile you program (you have to ensure that Java is installed and configured on your machine) and then it will launch automatically two instances of the program in order to see if data races occur.
 
 ### Part 2 : Fix the API
 
