@@ -41,6 +41,8 @@
 - The `Pocket` class also suffers from possible race conditions, since it contains a method that is able to perform a write in a file. We have to ensure that this is done in a thread-safe manner.
 - These protections are enough because `Pocket` & `Wallet` classes were the only ones that were allowed to perform any form of writing and since all other classes don't rely on data writes in order to run, we are sure that our program does not contain data races issues anymore.
 
+![Thread Safe Version](/assets/lab1/thread-safe.png)
+
 The thread safe withdraw function implemented in `Wallet` class 
    
    ```java
