@@ -4,24 +4,42 @@
 
 ### Part 0 : About source code
 
-- All our code is located in src folder 
+- All our code is located in `src` folder, it contains several elements :
+    - `ShoppingCart` class, where our main function is located
+    - `backEnd/` folder, where classes that manage our pocket, our wallet and the store are located
+    - a `Makefile`, that can automatically build our project, or manage wallet and pocket text files 
+    - `scripts/` folder, where a batch script that automate the process of buying a car is located
 
 
 ### Part 1 : Exploit your program
 
-- Shared resources are the wallet (wallet.txt) and our pocket (pocket.txt), that are shared between users that call our ShoppingCart.java file.
+- Shared resources are the wallet `wallet.txt` and our pocket `pocket.txt`, that are shared between users that call our `ShoppingCart.java` file.
 - The root of the problem is that our program verify in a first step that we have enough money in our wallet, but only withdraw it in a second step. If two or more users are calling the function at the same time, it can happen that both programs enter in the first step at the same time.
-- To attack the system, you can run at the same time several instances of the program and when a data race error occurs, you will be able to have several items in your pocket.txt by paying only for one of them.
+- To attack the system, you can run at the same time several instances of the program and when a data race error occurs, you will be able to have several items in your `pocket.txt` by paying only for one of them.
+
+   
+```
+
+                                THREAD 1
+                
+--| Get Balance |-------------| Withdraw Money |---------------------->
+
+-------------------| Get Balance |----------------| Withdraw Money|--->
+
+                                THREAD 2
+
+```
+If the configuration above happens during execution, a problem will occur and will cause troubles in the accuracy of the program. This error is highlighted using the `run.bat` script with the unpatched version of the code.
 
 - In order to compile and run this program (Windows), you can simply use your command prompt and run the program run.bat located in src folder. It will compile you program (you have to ensure that Java is installed and configured on your machine) and then it will launch automatically two instances of the program in order to see if data races occur.
 
 ### Part 2 : Fix the API
 
-- The safeWidthDraw function is implemented in the Wallet class.
-- The Pocket class also suffers from possible race conditions, since it contains a method that is able to perform a write in a file. We have to ensure that this is done in a thread-safe manner.
-- These protections are enough because Pocket & Wallet classes were the only ones that were allowed to perform any form of writing and since all other classes don't rely on data writes in order to run, we are sure that our program does not contain data races issues anymore.
+- The `safeWidthDraw` function is implemented in the `Wallet` class.
+- The `Pocket` class also suffers from possible race conditions, since it contains a method that is able to perform a write in a file. We have to ensure that this is done in a thread-safe manner.
+- These protections are enough because `Pocket` & `Wallet` classes were the only ones that were allowed to perform any form of writing and since all other classes don't rely on data writes in order to run, we are sure that our program does not contain data races issues anymore.
 
-The thread safe withdraw function implemented in Wallet class 
+The thread safe withdraw function implemented in `Wallet` class 
    
    ```java
    
@@ -38,7 +56,7 @@ The thread safe withdraw function implemented in Wallet class
    
    ```
 
-The thread safe pocket adding implemented in Pocket class
+The thread safe pocket adding implemented in `Pocket` class
 
 ```java
 
