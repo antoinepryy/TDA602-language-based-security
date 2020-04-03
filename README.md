@@ -4,20 +4,20 @@
 
 ### Part 0 : About source code
 
-- All our code is located in `src` folder, it contains several elements :
-    - `ShoppingCart` class, where our main function is located
-    - `backEnd/` folder, where classes that manage our pocket, our wallet and the store are located
-    - a `Makefile`, that can automatically build our project, or manage wallet and pocket text files 
-    - `scripts/` folder, where we implemented some batch scripts to automate coherence checking, automatizes products buying, etc..
-    - `run_candies.bat` and `run_car.bat` scripts, that you can run in order to check whether or not data races problems occurs
+- All our code is located in the `src` folder, it contains several elements :
+    - `ShoppingCart` class, where our main function is located.
+    - `backEnd/` folder, where classes that manage our pocket, our wallet and the store are located.
+    - a `Makefile`, that can automatically build our project or manage the wallet and pocket text files.
+    - `scripts/` folder, where we implemented some batch scripts to automate coherence checking, automatize products buying, etc.
+    - `run_candies.bat` and `run_car.bat` scripts, that you can run in order to check whether or not data races problems occur.
 
 
 ### Part 1 : Exploit your program
 
 - Shared resources are the wallet `wallet.txt` and our pocket `pocket.txt`, that are shared between users that call our `ShoppingCart.java` file.
-- The root of the problem is that our program verify in a first step that we have enough money in our wallet, but only withdraw it in a second step. If two or more users are calling the function **at the same time**, it can happen that both programs enter in the first step at the same time.
-- To attack the system, you can run at the same time several instances of the program and when a data race error occurs, you will be able to have several items in your `pocket.txt` that you might **not have payed**.
-- If the configuration below happens during execution, a problem will occur and will cause troubles in the accuracy of the program. This error is highlighted using the `run_car.bat` and `run_candies.bat` scripts if we use the **unpatched** version of the code. These scripts are respectively buying 2 cars, or 14 candies at the same time and check whether or not a data race error occurs.
+- The root of the problem is that our program verifies in a first step that we have enough money in our wallet, but only withdraws it in a second step. If two or more users are calling the function **at the same time**, it can happen that these multiple programs enter the first step simultaneously.
+- To attack the system, you can run at the same time several instances of the program and when a data race error occurs, you will be able to add several items in your `pocket.txt` that you might **not have payed for**.
+- If the configuration below happens during execution, a problem will occur and will cause troubles in the accuracy of the program. This error is highlighted using the `run_car.bat` and `run_candies.bat` scripts with the **unpatched** version of the code. These scripts are respectively buying 2 cars or 14 candies at the same time and check whether or not a data race error occurs.
 
    
 ```
@@ -33,7 +33,7 @@
 ```
 
 - Our `run_car.bat` script fills our wallet with 30000$, empties our pocket and then spawns 2 threads that will try to buy a car. Once the operation is finished, it checks if data race errors occurred by counting the number of items that were bought.
-- Our `run_candies.bat` script fills our wallet with 30000$, empties our pocket and then spawns 14 threads that will try to buy candies. Once the operation is finished, it checks if data race errors occurred by checking money in our wallet.
+- Our `run_candies.bat` script fills our wallet with 30000$, empties our pocket and then spawns 14 threads that will try to buy candies. Once the operation is finished, it checks if data race errors occurred by checking the money in our wallet.
 
 - In order to compile and run this program (Windows), you can simply use your command prompt and run the program `run.bat` located in src folder. It will compile you program (you have to ensure that Java is installed and configured on your machine) and then it will launch automatically two instances of the program in order to see if data races occur.
 
@@ -41,7 +41,7 @@
 
 ### Part 2 : Fix the API
 
-- The `safeWidthDraw` function is implemented in the `Wallet` class.
+- The `safeWithdraw` function is implemented in the `Wallet` class.
 - The `Pocket` class also suffers from possible race conditions, since it contains a method that is able to perform a write in a file. We have to ensure that this is done in a thread-safe manner.
 - These protections are enough because `Pocket` & `Wallet` classes were the only ones that were allowed to perform any form of writing and since all other classes don't rely on data writes in order to run, we are sure that our program does not contain data races issues anymore.
 
@@ -149,5 +149,5 @@ instead of
 
 ```
 
-- To fix this program we used a lock to perform operations in parallel without incoherence between our wallet and pocket file. A FileLock class is used for each file to ensure that critical functions are not executed at the same time. `FileLock lock = file.getChannel().lock();` is a blocking call, meaning that each thread will wait to obtain the lock to write or read the files.
+- To fix this program, we used a lock to perform operations in parallel without incoherence between our wallet and pocket files. A FileLock class is used for each file to ensure that critical functions are not executed at the same time. `FileLock lock = file.getChannel().lock();` is a blocking call, meaning that each thread will wait to obtain the lock to write or read the files.
 
