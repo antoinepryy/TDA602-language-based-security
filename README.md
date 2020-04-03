@@ -5,11 +5,11 @@
 ### Part 0 : About source code
 
 All our code is located in the `src/` folder, it contains several elements :
-    - `ShoppingCart` class, where our main function is located.
-    - `backEnd/` folder, where classes that manage our pocket, our wallet and the store are located.
-    - a `Makefile`, that can automatically build our project or manage the wallet and pocket text files.
-    - `scripts/` folder, where we implemented some batch scripts to automate coherence checking, automatize products buying, etc.
-    - `run_candies.bat` and `run_car.bat` scripts, that you can run in order to check whether or not data races problems occur.
+- `ShoppingCart` class, where our main function is located.
+- `backEnd/` folder, where classes that manage our pocket, our wallet and the store are located.
+- a `Makefile`, that can automatically build our project or manage the wallet and pocket text files.
+- `scripts/` folder, where we implemented some batch scripts to automate coherence checking, automatize products buying, etc.
+- `run_candies.bat` and `run_car.bat` scripts, that you can run in order to check whether or not data races problems occur.
     
 If you just want to compile and run the program, you can type the commands above in your shell, when you are in the `src` folder
 
