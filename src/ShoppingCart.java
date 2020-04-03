@@ -1,4 +1,6 @@
-import backEnd.*;
+import backEnd.Pocket;
+import backEnd.Store;
+import backEnd.Wallet;
 
 import java.util.Scanner;
 
@@ -7,7 +9,7 @@ public class ShoppingCart {
         Wallet wallet = new Wallet();
         Pocket pocket = new Pocket();
 
-        System.out.println("Your current balance is: " + wallet.getBalance() + " credits.");
+        System.out.println("Your current balance is: " + wallet.getBalanceThreadSafe() + " credits.");
         System.out.println(Store.asString());
 
         System.out.print("What do you want to buy? ");
@@ -15,21 +17,16 @@ public class ShoppingCart {
         String product = scan.nextLine();
 
 
-        int currentBalance = wallet.getBalance();
-        // Check if the amount of credit is enough, if not stop the execution
-        if (currentBalance >= Store.getProductPrice(product)) {
-            System.out.println("You just bought a " + product);
-            Thread.sleep(1000);
-            // Withdraw the price of the product from the wallet
-            wallet.setBalance(currentBalance - Store.getProductPrice(product));
-            // add the name of the product to the pocket file
+        try {
+            wallet.safeWithdraw(Store.getProductPrice(product));
             pocket.addProduct(product);
-            // print the new balance.
-            System.out.println("New balance : " + wallet.getBalance());
-        } else {
-            System.out.println("Not enough money in your wallet.. closing program !");
-            System.exit(0);
+            System.out.println(String.format("Your new balance is: %d", wallet.getBalanceThreadSafe()));
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+        wallet.close();
+        pocket.close();
+        System.exit(0);
 
 
     }
