@@ -19,7 +19,7 @@ public class ShoppingCart {
 
         try {
             wallet.safeWithdraw(Store.getProductPrice(product));
-            pocket.addProduct(product);
+            pocket.safeAddProduct(product);
             System.out.println(String.format("Your new balance is: %d", wallet.getBalanceThreadSafe()));
         } catch (Exception e) {
             e.printStackTrace();

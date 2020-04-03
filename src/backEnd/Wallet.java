@@ -30,7 +30,11 @@ public class Wallet {
         return Integer.parseInt(this.file.readLine());
     }
 
-
+    /**
+     * Gets the wallet balance.
+     *
+     * @return The content of the wallet file as an integer, this version is thread-safe
+     */
     public int getBalanceThreadSafe() throws IOException {
         FileLock lock = file.getChannel().lock();
         this.file.seek(0);
