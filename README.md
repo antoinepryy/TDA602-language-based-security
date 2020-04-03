@@ -4,29 +4,27 @@
 
 ### Part 0 : About source code
 
-All our code is located in the `src/` folder, it contains several elements :
+All our code is located in the `src/` folder. It contains several elements :
 - `ShoppingCart` class, where our main function is located.
 - `backEnd/` folder, where classes that manage our pocket, our wallet and the store are located.
 - a `Makefile`, that can automatically build our project or manage the wallet and pocket text files.
 - `scripts/` folder, where we implemented some batch scripts to automate coherence checking, automatize products buying, etc.
 - `run_candies.bat` and `run_car.bat` scripts, that you can run in order to check whether or not data races problems occur.
     
-If you just want to compile and run the program, you can type the commands above in your shell, when you are in the `src` folder
+If you just want to compile and run the program, you can type the commands below in your shell, when you are in the `src` folder:
 
 ```bash
 make
 java ShoppingCart
 ```
 
-You will next been asked to choose what product you want top buy
-For the two batch scripts `run_candies.bat` and `run_car.bat` (we will talk about them later in the report) you can simply type, located in the `src/` folder
+You will next be asked to choose what product you want to buy.
+To run the batch scripts `run_candies.bat` and `run_car.bat` (we will talk about them later in the report) you can simply type in the shell, once located in the `src/` folder:
 
 ```bash
 run_candies.bat
 run_car.bat 
 ```
-
-located
 
 ### Part 1 : Exploit your program
 
@@ -51,7 +49,7 @@ located
 - Our `run_car.bat` script fills our wallet with 30000$, empties our pocket and then spawns 2 threads that will try to buy a car. Once the operation is finished, it checks if data race errors occurred by counting the number of items that were bought.
 - Our `run_candies.bat` script fills our wallet with 30000$, empties our pocket and then spawns 14 threads that will try to buy candies. Once the operation is finished, it checks if data race errors occurred by checking the money in our wallet.
 
-- In order to compile and run this program (Windows), you can simply use your command prompt and run the program `run.bat` located in src folder. It will compile you program (you have to ensure that Java is installed and configured on your machine) and then it will launch automatically two instances of the program in order to see if data races occur.
+- In order to compile and run this program (Windows), you can simply use your command prompt and run the program `run_car.bat` (or `run_candies.bat`) located in src folder. It will compile you program (you have to ensure that Java is installed and configured on your machine) and then it will launch automatically several instances of the program (2 or 14) in order to see if data races occur.
 
 ![No thread-Safe Version](/assets/lab1/no-thread-safe.PNG)
 
@@ -83,7 +81,7 @@ public void safeWithdraw(int valueToWithdraw) throws Exception {
 
 ```
 
-The `getBalance` function had to be rewritten since an error can occur it we don't use the FileLock class in this section :
+The `getBalance` function had to be rewritten since an data race error can occur if we don't use the FileLock class in this section :
 
 ```java
 
