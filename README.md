@@ -4,13 +4,29 @@
 
 ### Part 0 : About source code
 
-- All our code is located in the `src` folder, it contains several elements :
+All our code is located in the `src/` folder, it contains several elements :
     - `ShoppingCart` class, where our main function is located.
     - `backEnd/` folder, where classes that manage our pocket, our wallet and the store are located.
     - a `Makefile`, that can automatically build our project or manage the wallet and pocket text files.
     - `scripts/` folder, where we implemented some batch scripts to automate coherence checking, automatize products buying, etc.
     - `run_candies.bat` and `run_car.bat` scripts, that you can run in order to check whether or not data races problems occur.
+    
+If you just want to compile and run the program, you can type the commands above in your shell, when you are in the `src` folder
 
+```bash
+make
+java ShoppingCart
+```
+
+You will next been asked to choose what product you want top buy
+For the two batch scripts `run_candies.bat` and `run_car.bat` (we will talk about them later in the report) you can simply type, located in the `src/` folder
+
+```bash
+run_candies.bat
+run_car.bat 
+```
+
+located
 
 ### Part 1 : Exploit your program
 
@@ -44,10 +60,12 @@
 - The `safeWithdraw` function is implemented in the `Wallet` class.
 - The `Pocket` class also suffers from possible race conditions, since it contains a method that is able to perform a write in a file. We have to ensure that this is done in a thread-safe manner.
 - These protections are enough because `Pocket` & `Wallet` classes were the only ones that were allowed to perform any form of writing and since all other classes don't rely on data writes in order to run, we are sure that our program does not contain data races issues anymore.
+- To fix this program, we used a lock to perform operations in parallel without incoherence between our wallet and pocket files. A FileLock class is used for each file to ensure that critical functions are not executed at the same time. `FileLock lock = file.getChannel().lock();` is a blocking call, meaning that each thread will wait to obtain the lock to write or read the files.
+
 
 ![Thread-Safe Version](/assets/lab1/thread-safe.PNG)
 
-The thread safe withdraw function implemented in `Wallet` class 
+The thread safe withdraw function implemented in `Wallet` class :
    
 ```java
 
@@ -65,7 +83,23 @@ public void safeWithdraw(int valueToWithdraw) throws Exception {
 
 ```
 
-The thread safe pocket adding implemented in `Pocket` class
+The `getBalance` function had to be rewritten since an error can occur it we don't use the FileLock class in this section :
+
+```java
+
+
+public int getBalanceThreadSafe() throws IOException {
+        FileLock lock = file.getChannel().lock();
+        this.file.seek(0);
+        String line = this.file.readLine();
+        lock.release();
+        return Integer.parseInt(line);
+
+    }
+
+```
+
+The thread safe pocket adding implemented in `Pocket` class :
 
 ```java
 
@@ -78,7 +112,7 @@ public void safeAddProduct(String product) throws Exception {
 
 ```
 
-We also have to bring some changes to our main function in order to use safe-threaded functions
+We also have to bring some changes to our main function in order to use safe-threaded functions :
 
 ```java
 
@@ -89,7 +123,7 @@ We also have to bring some changes to our main function in order to use safe-thr
                 System.out.println("Your current balance is: " + wallet.getBalanceThreadSafe() + " credits.");
                 System.out.println(Store.asString());
         
-                System.out.print("What do you want to buy? ");
+                System.out.println("What do you want to buy? ");
                 Scanner scan = new Scanner(System.in);
                 String product = scan.nextLine();
         
@@ -99,7 +133,7 @@ We also have to bring some changes to our main function in order to use safe-thr
                     pocket.safeAddProduct(product);
                     System.out.println(String.format("Your new balance is: %d", wallet.getBalanceThreadSafe()));
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    System.out.println(e.getMessage());
                 }
                 wallet.close();
                 pocket.close();
@@ -111,7 +145,7 @@ We also have to bring some changes to our main function in order to use safe-thr
 ```
 
 
-instead of 
+instead of :
 
 
 ```java
@@ -123,7 +157,7 @@ instead of
                 System.out.println("Your current balance is: " + wallet.getBalance() + " credits.");
                 System.out.println(Store.asString());
         
-                System.out.print("What do you want to buy? ");
+                System.out.println("What do you want to buy? ");
                 Scanner scan = new Scanner(System.in);
                 String product = scan.nextLine();
         
@@ -143,11 +177,10 @@ instead of
                     System.out.println("Not enough money in your wallet.. closing program !");
                     System.exit(0);
                 }
-        
-        
+                wallet.close();
+                pocket.close();
             }
 
 ```
 
-- To fix this program, we used a lock to perform operations in parallel without incoherence between our wallet and pocket files. A FileLock class is used for each file to ensure that critical functions are not executed at the same time. `FileLock lock = file.getChannel().lock();` is a blocking call, meaning that each thread will wait to obtain the lock to write or read the files.
 
