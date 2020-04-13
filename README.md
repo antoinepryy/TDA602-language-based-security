@@ -2,7 +2,7 @@
 
 ## Lab 1 - TOCTOU
 
-### Part 0 : About source code
+### Part 0 : About source code and definitions
 
 All our code is located in the `src/` folder. It contains several elements :
 - `ShoppingCart` class, where our main function is located.
@@ -26,6 +26,12 @@ run_candies.bat
 run_car.bat 
 ```
 
+In our report, we are going to use some concepts such as :
+- process : any program that is executed on a computer
+- thread : execution unit that is part of a process. A process can have multiple threads running at the same time, each one can have its own state (pending, running, ready, ..)
+- thread-safety : capacity of several computing entities (threads or processes) to resist against concurrency during overlapping executions. Race conditions can affect data shared between several threads within a single processes (variables, etc), or can affect several independant processes (which try to dit files or OS register for example) 
+
+
 ### Part 1 : Exploit your program
 
 - Shared resources are the wallet `wallet.txt` and our pocket `pocket.txt`, that are shared between users that call our `ShoppingCart.java` file.
@@ -36,18 +42,18 @@ run_car.bat
    
 ```
 
-                                THREAD 1
+                                PROCESS 1
                 
 --| Get Balance |-------------| Withdraw Money |---------------------->
 
 -------------------| Get Balance |----------------| Withdraw Money|--->
 
-                                THREAD 2
+                                PROCESS 2
 
 ```
 
-- Our `run_car.bat` script fills our wallet with 30000$, empties our pocket and then spawns 2 threads that will try to buy a car. Once the operation is finished, it checks if data race errors occurred by counting the number of items that were bought.
-- Our `run_candies.bat` script fills our wallet with 30000$, empties our pocket and then spawns 14 threads that will try to buy candies. Once the operation is finished, it checks if data race errors occurred by checking the money in our wallet.
+- Our `run_car.bat` script fills our wallet with 30000$, empties our pocket and then spawns 2 processes that will try to buy a car. Once the operation is finished, it checks if data race errors occurred by counting the number of items that were bought.
+- Our `run_candies.bat` script fills our wallet with 30000$, empties our pocket and then spawns 14 processes that will try to buy candies. Once the operation is finished, it checks if data race errors occurred by checking the money in our wallet.
 
 - In order to compile and run this program (Windows), you can simply use your command prompt and run the program `run_car.bat` (or `run_candies.bat`) located in src folder. It will compile you program (you have to ensure that Java is installed and configured on your machine) and then it will launch automatically several instances of the program (2 or 14) in order to see if data races occur.
 
@@ -58,7 +64,7 @@ run_car.bat
 - The `safeWithdraw` function is implemented in the `Wallet` class.
 - The `Pocket` class also suffers from possible race conditions, since it contains a method that is able to perform a write in a file. We have to ensure that this is done in a thread-safe manner.
 - These protections are enough because `Pocket` & `Wallet` classes were the only ones that were allowed to perform any form of writing and since all other classes don't rely on data writes in order to run, we are sure that our program does not contain data races issues anymore.
-- To fix this program, we used a lock to perform operations in parallel without incoherence between our wallet and pocket files. A FileLock class is used for each file to ensure that critical functions are not executed at the same time. `FileLock lock = file.getChannel().lock();` is a blocking call, meaning that each thread will wait to obtain the lock to write or read the files.
+- To fix this program, we used a lock to perform operations in parallel without incoherence between our wallet and pocket files. A FileLock class is used for each file to ensure that critical functions are not executed at the same time. `FileLock lock = file.getChannel().lock();` is a blocking call, meaning that each process will wait to obtain the lock to write or read the files. Others type of locks can be used in Java (ReentrantLock for examples), but since our problem is caused by several processes running at the same moment, a thread will not share their ressources with another thread because it be in an other process. At the end, wallet and pocket are thus the only parts that are shared among this program so FileLock is enough.
 
 
 ![Thread-Safe Version](/assets/lab1/thread-safe.PNG)
@@ -81,7 +87,7 @@ public void safeWithdraw(int valueToWithdraw) throws Exception {
 
 ```
 
-The `getBalance` function had to be rewritten since an data race error can occur if we don't use the FileLock class in this section :
+The `getBalance` function had to be rewritten since a data race error can occur if we don't use the FileLock class in this section. Normally we should not be obliged to do this since our program just read and doesn't perform any writing on the file, but on windows removing the lock often cause troubles, so we decided to keep it to preserve program integrity instead of performances :
 
 ```java
 

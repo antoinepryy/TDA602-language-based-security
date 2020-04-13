@@ -25,7 +25,7 @@ public class Wallet {
      *
      * @return The content of the wallet file as an integer
      */
-    public int getBalance() throws IOException {
+    private int getBalance() throws IOException {
         this.file.seek(0);
         return Integer.parseInt(this.file.readLine());
     }
@@ -49,7 +49,7 @@ public class Wallet {
      *
      * @param newBalance new balance to write in the wallet
      */
-    public void setBalance(int newBalance) throws Exception {
+    private void setBalance(int newBalance) throws Exception {
         this.file.setLength(0);
         String str = Integer.valueOf(newBalance).toString() + '\n';
         this.file.writeBytes(str);

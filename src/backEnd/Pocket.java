@@ -25,7 +25,7 @@ public class Pocket {
      *
      * @param product product name to add to the pocket (e.g. "car")
      */
-    public void addProduct(String product) throws Exception {
+    private void addProduct(String product) throws Exception {
         this.file.seek(this.file.length());
         this.file.writeBytes(product + '\n');
     }
