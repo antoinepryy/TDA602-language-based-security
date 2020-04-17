@@ -27,7 +27,7 @@ run_car.bat
 ```
 
 In our report, we are going to use some concepts such as :
-- process : any program that is executed on a computer
+- process : any program that is executed on a computer. In this context, running `java ShoppingCart` will spawn a new process on our machine.
 - thread : execution unit that is part of a process. A process can have multiple threads running at the same time, each one can have its own state (pending, running, ready, ..)
 - thread-safety : capacity of several computing entities (threads or processes) to resist against concurrency during overlapping executions. Race conditions can affect data shared between several threads within a single processes (variables, etc), or can affect several independant processes (which try to dit files or OS register for example) 
 
@@ -62,14 +62,14 @@ In our report, we are going to use some concepts such as :
 ### Part 2 : Fix the API
 
 - The `safeWithdraw` function is implemented in the `Wallet` class.
-- The `Pocket` class also suffers from possible race conditions, since it contains a method that is able to perform a write in a file. We have to ensure that this is done in a thread-safe manner.
+- The `Pocket` class also suffers from possible race conditions, since it contains a method that is able to write in a file. We have to ensure that this is done in a safe way.
 - These protections are enough because `Pocket` & `Wallet` classes were the only ones that were allowed to perform any form of writing and since all other classes don't rely on data writes in order to run, we are sure that our program does not contain data races issues anymore.
-- To fix this program, we used a lock to perform operations in parallel without incoherence between our wallet and pocket files. A FileLock class is used for each file to ensure that critical functions are not executed at the same time. `FileLock lock = file.getChannel().lock();` is a blocking call, meaning that each process will wait to obtain the lock to write or read the files. Others type of locks can be used in Java (ReentrantLock for examples), but since our problem is caused by several processes running at the same moment, a thread will not share their ressources with another thread because it be in an other process. At the end, wallet and pocket are thus the only parts that are shared among this program so FileLock is enough.
+- To fix this program, we used a lock to perform operations in parallel without incoherence between our wallet and pocket files. A FileLock class is used for each file to ensure that critical functions are not executed at the same time. `FileLock lock = file.getChannel().lock();` is a blocking call, meaning that each process will wait to obtain the lock to write or read the files. Others type of locks can be used in Java (ReentrantLock for examples), but since our problem is caused by several processes running at the same moment, a thread will not share their resources with another thread because it will be in an other process. At the end, wallet and pocket are thus the only parts that are shared among this program so FileLock is enough.
 
 
 ![Thread-Safe Version](/assets/lab1/thread-safe.PNG)
 
-The thread safe withdraw function implemented in `Wallet` class :
+The new withdraw function implemented in `Wallet` class, that avoid data races problems:
    
 ```java
 
@@ -87,7 +87,7 @@ public void safeWithdraw(int valueToWithdraw) throws Exception {
 
 ```
 
-The `getBalance` function had to be rewritten since a data race error can occur if we don't use the FileLock class in this section. Normally we should not be obliged to do this since our program just read and doesn't perform any writing on the file, but on windows removing the lock often cause troubles, so we decided to keep it to preserve program integrity instead of performances :
+The `getBalance` function had to be rewritten since a data race error can occur if we don't use the FileLock class in this section. Normally we should not be obliged to do this since our program just read and doesn't perform any writing on the file, but on windows, removing the lock often cause troubles, so we decided to keep it to preserve program integrity instead of performances:
 
 ```java
 
@@ -103,7 +103,7 @@ public int getBalanceThreadSafe() throws IOException {
 
 ```
 
-The thread safe pocket adding implemented in `Pocket` class :
+Since the pocket file is also shared between processes, we also have to fix this part of the API. Here is the safe version implemented in `Pocket` class:
 
 ```java
 
@@ -116,7 +116,7 @@ public void safeAddProduct(String product) throws Exception {
 
 ```
 
-We also have to bring some changes to our main function in order to use safe-threaded functions :
+We also have to bring some changes to our main function in order to replace unsafe methods by their patched versions functions:
 
 ```java
 
@@ -149,7 +149,7 @@ We also have to bring some changes to our main function in order to use safe-thr
 ```
 
 
-instead of :
+instead of:
 
 
 ```java
