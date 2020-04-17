@@ -70,7 +70,7 @@ In our report, we are going to use some concepts such as :
 
 ![Thread-Safe Version](/assets/lab1/thread-safe.PNG)
 
-The new withdraw function implemented in `Wallet` class, that avoid data races problems:
+The new withdraw function implemented in `Wallet` class, that avoids data races problems:
    
 ```java
 
@@ -88,7 +88,7 @@ public void safeWithdraw(int valueToWithdraw) throws Exception {
 
 ```
 
-The `getBalance` function had to be rewritten since a data race error can occur if we don't use the FileLock class in this section. Normally we should not have to do this since our program just reads and doesn't perform any writing on the file, but on Windows, removing the lock often cause troubles. So we decided to keep it in order to preserve the program's integrity instead of the performances:
+The `getBalance` function had to be rewritten since a data race error can occur if we don't use the FileLock class in this section. Normally we should not have to do this since our program just reads and doesn't perform any writing on the file, but on Windows, removing the lock often causes troubles. So we decided to keep it in order to preserve the program's integrity instead of the performances:
 
 ```java
 
